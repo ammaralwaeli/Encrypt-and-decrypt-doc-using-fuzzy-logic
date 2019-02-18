@@ -27,12 +27,13 @@ public class EncryptionFrame extends javax.swing.JFrame {
     ArrayList<Integer> asci;
     ArrayList<String> binary;
     String state, key;
-    Decryption dec;
     Encryption enc;
     String n = null;
     private Scanner in;
     File file;
+    int nmbr;
     private String line;
+    boolean saved;
 
     public void setLetters(ArrayList<Character> letters) {
         //letters.clear();
@@ -51,10 +52,6 @@ public class EncryptionFrame extends javax.swing.JFrame {
         this.asci = asci;
     }
 
-    public void setDecryption(Decryption d, File f) {
-        this.dec = d;
-        this.file = f;
-    }
 
     public void setEncryption(Encryption e) {
         this.enc = e;
@@ -62,8 +59,10 @@ public class EncryptionFrame extends javax.swing.JFrame {
 
     public EncryptionFrame() {
         initComponents();
+        nmbr=130;
         RandomKey = new ArrayList<>();
         letters = new ArrayList<>();
+        saved = false;
     }
 
     /**
@@ -168,7 +167,7 @@ public class EncryptionFrame extends javax.swing.JFrame {
         );
 
         getContentPane().add(jPanel3);
-        jPanel3.setBounds(10, 370, 800, 164);
+        jPanel3.setBounds(10, 370, 800, 159);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Random Code Generator"));
         jPanel2.setOpaque(false);
@@ -245,7 +244,7 @@ public class EncryptionFrame extends javax.swing.JFrame {
         );
 
         getContentPane().add(jPanel2);
-        jPanel2.setBounds(10, 170, 800, 203);
+        jPanel2.setBounds(10, 170, 800, 193);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Plain Text"));
         jPanel1.setOpaque(false);
@@ -284,7 +283,7 @@ public class EncryptionFrame extends javax.swing.JFrame {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(17, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel3)
@@ -363,11 +362,11 @@ public class EncryptionFrame extends javax.swing.JFrame {
         jTextArea3.setText(result);
         int x = 0;
         int y = 0;
-        for (int i = 0; i < result.length() / 8; i++) {
-            bytes.add(result.substring(x, x + 8));
-            x += 8;
+        for (int i = 0; i < result.length() / 12; i++) {
+            bytes.add(result.substring(x, x + 12));
+            x += 12;
             //System.out.print(bytes.get(i) + "\n");
-            ascii[i] = (char) binaryToDecimal(Integer.parseInt(bytes.get(i)));
+            ascii[i] = (char) binaryToDecimal(Long.parseLong(bytes.get(i)));
             jTextArea6.setText(jTextArea6.getText() + ascii[i]);
         }
     }//GEN-LAST:event_XORMouseClicked
@@ -379,28 +378,30 @@ public class EncryptionFrame extends javax.swing.JFrame {
         jTextArea2.setText("");
         String line1 = "", n1 = "";
         String lin = JOptionPane.showInputDialog(this, "Enter keyword please !", "Enter data", JOptionPane.DEFAULT_OPTION);
-        Number r = new Number(lin);
-        for (int i = 0; i < letters.size(); i++) {
-            RandomKey.add(r.random(122));
-            /*while (RandomKey.get(i) == 0){
+        if (lin != null) {
+            Number r = new Number(lin);
+            for (int i = 0; i < letters.size(); i++) {
+                RandomKey.add(r.random(nmbr));
+                /*while (RandomKey.get(i) == 0){
                 RandomKey.remove(i);
                 RandomKey.add(r.random(150));
             }*/
-            jTextArea5.setText(jTextArea5.getText() + RandomKey.get(i) + " ");
-            line1 = Integer.toBinaryString(RandomKey.get(i));
-            if (line1.length() < 8) {
-                for (int j = 0; j < 8 - line1.length(); j++) {
-                    n1 += "0";
+                jTextArea5.setText(jTextArea5.getText() + RandomKey.get(i) + " ");
+                line1 = Integer.toBinaryString(RandomKey.get(i));
+                if (line1.length() < 12) {
+                    for (int j = 0; j < 12 - line1.length(); j++) {
+                        n1 += "0";
+                    }
+                    n1 += line1;
+                    jTextArea2.setText(jTextArea2.getText() + n1);
+                    //System.out.print(n1 + "\n");
+                } else {
+                    jTextArea2.setText(jTextArea2.getText() + line1);
                 }
-                n1 += line1;
-                jTextArea2.setText(jTextArea2.getText() + n1);
-                //System.out.print(n1 + "\n");
-            } else {
-                jTextArea2.setText(jTextArea2.getText() + line1);
-            }
 
-            n1 = "";
-            line1 = "";
+                n1 = "";
+                line1 = "";
+            }
         }
     }//GEN-LAST:event_GetRandKeyMouseClicked
 
@@ -411,45 +412,50 @@ public class EncryptionFrame extends javax.swing.JFrame {
         jTextArea2.setText("");
         String line1 = "", n1 = "";
         String lin = JOptionPane.showInputDialog(this, "Enter keyword please !", "Enter data", JOptionPane.DEFAULT_OPTION);
-        Number r = new Number(lin);
-        for (int i = 0; i < letters.size(); i++) {
-            RandomKey.add(r.random(122));
-            sum += RandomKey.get(i);
-        }
-        div = sum / RandomKey.size();
-        s = (RandomKey.size() * 3) / 2;
-        m = (RandomKey.size() * 3) / 2 + s;
-        l = (RandomKey.size() * 3) / 2 + (s * 2);
-
-        if (s + m < 100) {
-            s = s + m;
-            m = m + s;
-        } else if (s + m > 100 && s + m < 200) {
-            m = Math.abs(m - s);
-            s = Math.abs(s - m);
-        } else {
-            s = (int) (Math.pow(s, 2));
-            m = (int) (Math.pow(m, 2));
-            l = (int) (Math.pow(l, 2));
-        }
-        jTextArea5.setText(jTextArea5.getText() + div + "   Length:" + letters.size());
-        for (Character letter : letters) {
-
-            line1 = Integer.toBinaryString(div);
-            if (line1.length() < 8) {
-                for (int j = 0; j < 8 - line1.length(); j++) {
-                    n1 += "0";
-                }
-                n1 += line1;
-                jTextArea2.setText(jTextArea2.getText() + n1);
-                //System.out.print(n1 + "\n");
-            } else {
-                jTextArea2.setText(jTextArea2.getText() + line1);
+        if (lin != null) {
+            Number r = new Number(lin);
+            for (int i = 0; i < letters.size(); i++) {
+                RandomKey.add(r.random(nmbr));
+                sum += RandomKey.get(i);
+                
             }
+            
+            div = sum / RandomKey.size();
+            s = (RandomKey.size() * 3) / 2;
+            m = (RandomKey.size() * 3) / 2 + s;
+            l = (RandomKey.size() * 3) / 2 + (s * 2);
 
-            n1 = "";
-            line1 = "";
+            if (s + m < 100) {
+                s = s + m;
+                m = m + s;
+            } else if (s + m > 100 && s + m < 200) {
+                m = Math.abs(m - s);
+                s = Math.abs(s - m);
+            } else {
+                s = (int) (Math.pow(s, 2));
+                m = (int) (Math.pow(m, 2));
+                l = (int) (Math.pow(l, 2));
+            }
+            jTextArea5.setText(div + "   Length:" + letters.size());
+            for (Character letter : letters) {
+
+                line1 = Integer.toBinaryString(div);
+                if (line1.length() < 12) {
+                    for (int j = 0; j < 12 - line1.length(); j++) {
+                        n1 += "0";
+                    }
+                    n1 += line1;
+                    jTextArea2.setText(jTextArea2.getText() + n1);
+                    //System.out.print(n1 + "\n");
+                } else {
+                    jTextArea2.setText(jTextArea2.getText() + line1);
+                }
+
+                n1 = "";
+                line1 = "";
+            }
         }
+
 
     }//GEN-LAST:event_FuzzyKeyMouseClicked
 
@@ -473,6 +479,7 @@ public class EncryptionFrame extends javax.swing.JFrame {
                 fw.write(jTextArea6.getText());
                 fw.close();
                 f.setReadOnly();
+                saved = true;
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 //System.exit(0);
@@ -500,7 +507,14 @@ public class EncryptionFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_Save1MouseClicked
 
     private void Back1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Back1MouseClicked
-        System.exit(0);
+        if (saved) {
+            System.exit(0);
+        } else {
+            if (JOptionPane.showConfirmDialog(this, "Do you want to exit without saving your encryption message?", "Confirm", JOptionPane.YES_NO_OPTION) == 0) {
+                System.exit(0);
+            }
+        }
+
     }//GEN-LAST:event_Back1MouseClicked
 
     public String[] split(String s) {
@@ -523,14 +537,16 @@ public class EncryptionFrame extends javax.swing.JFrame {
         }
     }
 
-    public static int binaryToDecimal(int binaryNumber) {
+    public static long binaryToDecimal(long binaryNumber) {
         //System.out.print("Enter the binary number : ");
-        int d = binaryNumber, c;
+        long d = binaryNumber;
+        int c;
         for (c = 0; d != 0; c++) {
             d /= 10;
         }
-        int e = binaryNumber;
-        int N[] = new int[c];
+        long e = binaryNumber;
+        long N[];
+        N = new long[c];
         for (int i = 0; i < c; i++) {
             N[i] = e % 10;
             e /= 10;

@@ -32,10 +32,12 @@ public class DecryptionFrame extends javax.swing.JFrame {
     String n = null;
     private Scanner in;
     File file;
+    int nmbr;
     private ArrayList<String> bytes;
 
     public DecryptionFrame() {
         initComponents();
+        nmbr=130;
         RandomKey = new ArrayList<>();
         letters = new ArrayList<>();
     }
@@ -84,10 +86,10 @@ public class DecryptionFrame extends javax.swing.JFrame {
                 key = line;
                 jTextArea2.setText(key);
 
-                for (int i = 0; i < key.length() / 8; i++) {
-                    bytes.add(key.substring(x, x + 8));
-                    x += 8;
-                    ascii[i] = (char) binaryToDecimal(Integer.parseInt(bytes.get(i)));
+                for (int i = 0; i < key.length() / 12; i++) {
+                    bytes.add(key.substring(x, x + 12));
+                    x += 12;
+                    ascii[i] = (char) binaryToDecimal(Long.parseLong(bytes.get(i)));
                     jTextArea5.setText(jTextArea5.getText() + ascii[i] + " ");
                 }
             }
@@ -96,21 +98,22 @@ public class DecryptionFrame extends javax.swing.JFrame {
         }
     }
 
-    public static int binaryToDecimal(int binaryNumber) {
+    public static int binaryToDecimal(Long binaryNumber) {
         //System.out.print("Enter the binary number : ");
-        int d = binaryNumber, c;
+        Long d = binaryNumber;
+        int c;
         for (c = 0; d != 0; c++) {
             d /= 10;
         }
-        int e = binaryNumber;
-        int N[] = new int[c];
+        Long e = binaryNumber;
+        Long N[] = new Long[c];
         for (int i = 0; i < c; i++) {
             N[i] = e % 10;
             e /= 10;
         }
         boolean w = true;
-        for (int i = 0; i < N.length; i++) {
-            if (N[i] != 1 && N[i] != 0) {
+        for (Long N1 : N) {
+            if (N1 != 1 && N1 != 0) {
                 w = false;
             }
         }
@@ -214,13 +217,13 @@ public class DecryptionFrame extends javax.swing.JFrame {
                     .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 79, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2)
                     .addComponent(jScrollPane1))
                 .addContainerGap())
         );
 
         getContentPane().add(jPanel1);
-        jPanel1.setBounds(10, 11, 810, 144);
+        jPanel1.setBounds(10, 11, 810, 161);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Fuzzy Key Generator"));
         jPanel2.setOpaque(false);
@@ -266,7 +269,6 @@ public class DecryptionFrame extends javax.swing.JFrame {
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel4)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 352, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
@@ -290,13 +292,13 @@ public class DecryptionFrame extends javax.swing.JFrame {
                     .addComponent(jLabel6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3)
                     .addComponent(jScrollPane5))
                 .addContainerGap())
         );
 
         getContentPane().add(jPanel2);
-        jPanel2.setBounds(10, 166, 810, 188);
+        jPanel2.setBounds(10, 166, 810, 193);
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Plain Text"));
         jPanel3.setOpaque(false);
@@ -411,15 +413,15 @@ public class DecryptionFrame extends javax.swing.JFrame {
         String lin = JOptionPane.showInputDialog(this, "Enter keyword please !", "Enter data", JOptionPane.DEFAULT_OPTION);
         Number r = new Number(lin);
         for (int i = 0; i < letters.size(); i++) {
-            RandomKey.add(r.random(122));
+            RandomKey.add(r.random(nmbr));
             /*while (RandomKey.get(i) == 0){
                 RandomKey.remove(i);
                 RandomKey.add(r.random(150));
             }*/
             jTextArea5.setText(jTextArea5.getText() + RandomKey.get(i) + " ");
             line = Integer.toBinaryString(RandomKey.get(i));
-            if (line.length() < 8) {
-                for (int j = 0; j < 8 - line.length(); j++) {
+            if (line.length() < 12) {
+                for (int j = 0; j < 12 - line.length(); j++) {
                     n1 += "0";
                 }
                 n1 += line;
@@ -435,7 +437,7 @@ public class DecryptionFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_GetKeyMouseClicked
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
-        int s, m, l, sum = 0, div;
+        int sum = 0, div;
         jTextArea5.setText("");
         RandomKey.clear();
         jTextArea2.setText("");
@@ -443,31 +445,16 @@ public class DecryptionFrame extends javax.swing.JFrame {
         String lin = JOptionPane.showInputDialog(this, "Enter keyword please !", "Enter data", JOptionPane.DEFAULT_OPTION);
         Number r = new Number(lin);
         for (int i = 0; i < letters.size(); i++) {
-            RandomKey.add(r.random(122));
+            RandomKey.add(r.random(nmbr));
             sum += RandomKey.get(i);
         }
         div = sum / RandomKey.size();
-        s = (RandomKey.size() * 3) / 2;
-        m = (RandomKey.size() * 3) / 2 + s;
-        l = (RandomKey.size() * 3) / 2 + (s * 2);
-
-        if (s + m < 100) {
-            s = s + m;
-            m = m + s;
-        } else if (s + m > 100 && s + m < 200) {
-            m = Math.abs(m - s);
-            s = Math.abs(s - m);
-        } else {
-            s = (int) (Math.pow(s, 2));
-            m = (int) (Math.pow(m, 2));
-            l = (int) (Math.pow(l, 2));
-        }
         jTextArea5.setText(jTextArea5.getText() + div + "   Length:" + letters.size());
         for (Character letter : letters) {
 
             line1 = Integer.toBinaryString(div);
-            if (line1.length() < 8) {
-                for (int j = 0; j < 8 - line1.length(); j++) {
+            if (line1.length() < 12) {
+                for (int j = 0; j < 12 - line1.length(); j++) {
                     n1 += "0";
                 }
                 n1 += line1;
@@ -500,10 +487,10 @@ public class DecryptionFrame extends javax.swing.JFrame {
         jTextArea3.setText(result);
         int x = 0;
         int y = 0;
-        for (int i = 0; i < result.length() / 8; i++) {
-            bytes1.add(result.substring(x, x + 8));
-            x += 8;
-            ascii[i] = (char) binaryToDecimal(Integer.parseInt(bytes1.get(i)));
+        for (int i = 0; i < result.length() / 12; i++) {
+            bytes1.add(result.substring(x, x + 12));
+            x += 12;
+            ascii[i] = (char) binaryToDecimal(Long.parseLong(bytes1.get(i)));
             jTextArea6.setText(jTextArea6.getText() + ascii[i]);
         }
     }//GEN-LAST:event_XORMouseClicked

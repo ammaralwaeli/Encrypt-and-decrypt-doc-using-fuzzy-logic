@@ -5,8 +5,10 @@
  */
 package newfuzzylogic;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,21 +32,27 @@ public class Encryption extends javax.swing.JFrame {
     String a[];
     char ch;
     int c;
-    boolean flag1, flag2, flag3;
+    boolean flag1, flag2, flag3, flag4;
     ArrayList<String> lines;
     ArrayList<Integer> asci;
-    ArrayList<String> binary;
+    ArrayList<Long> binary;
+    ArrayList<String> binary1;
     ArrayList<Character> letters;
     String state;
 
     public Encryption() {
         initComponents();
+        this.setSize(850, 670);
+        this.setMinimumSize(new Dimension(850, 0));
+        this.setMaximumSize(new Dimension(850, Integer.MAX_VALUE));
         lines = new ArrayList<>();
         asci = new ArrayList<>();
         binary = new ArrayList<>();
+        binary1 = new ArrayList<>();
         letters = new ArrayList<>();
         flag1 = false;
         flag2 = true;
+        flag4 = false;
     }
 
     /**
@@ -113,10 +121,10 @@ public class Encryption extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jLabel4.setText("Number of Letters");
         jLabel4.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+            }
             public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
                 jLabel4InputMethodTextChanged(evt);
-            }
-            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
             }
         });
         jLabel4.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -178,7 +186,7 @@ public class Encryption extends javax.swing.JFrame {
                     .addComponent(Refresh, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(Encryption, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(Encryption1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel3);
@@ -234,7 +242,7 @@ public class Encryption extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(Convert)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 351, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -251,7 +259,7 @@ public class Encryption extends javax.swing.JFrame {
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("Or");
         getContentPane().add(jLabel3);
-        jLabel3.setBounds(140, 44, 34, 30);
+        jLabel3.setBounds(140, 40, 40, 40);
 
         OPen.setText("Open file to convert");
         OPen.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -270,9 +278,18 @@ public class Encryption extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void PlainMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_PlainMouseClicked
-        Plain.setText("");
-        Plain.setEditable(true);
-        jLabel4.setText("Number of Letters : ");
+
+        if (!Plain.getText().equals("")) {
+            if (JOptionPane.showConfirmDialog(this, "Do you want to clear this message", "Confirm", JOptionPane.OK_CANCEL_OPTION) == 0) {
+                Plain.setText("");
+                Plain.setEditable(true);
+                jLabel4.setText("Number of Letters : ");
+                asci.clear();
+                binary.clear();
+                binary1.clear();
+                letters.clear();
+            }
+        }
     }//GEN-LAST:event_PlainMouseClicked
 
     private void PlainKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_PlainKeyTyped
@@ -303,18 +320,20 @@ public class Encryption extends javax.swing.JFrame {
         lines = new ArrayList<>();
         asci = new ArrayList<>();
         binary = new ArrayList<>();
+        binary1 = new ArrayList<>();
         letters = new ArrayList<>();
         state = "";
     }//GEN-LAST:event_RefreshMouseClicked
 
     private void EncryptionMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_EncryptionMouseClicked
-        if (!asci.isEmpty() && !letters.isEmpty() && !binary.isEmpty()) {
+        if (!asci.isEmpty() && !letters.isEmpty() && !binary1.isEmpty()) {
+            flag4 = true;
             state = "E";
             EncryptionFrame x = new EncryptionFrame();
             x.setLetters(letters);
             x.setEncryption(this);
             x.setASCII(asci);
-            x.setBinary(binary);
+            x.setBinary(binary1);
             x.setVisible(true);
             x.setResizable(false);
         }
@@ -322,15 +341,16 @@ public class Encryption extends javax.swing.JFrame {
 
     private void ConvertMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ConvertMouseClicked
         if (!Plain.getText().equals("")) {
+            letters.clear();
             DefaultTableModel model = new DefaultTableModel();
             jTable1.setModel(model);
             model.addColumn("Letters");
             model.addColumn("ASCII Code");
             model.addColumn("Binary Code");
             getBinary(Plain.getText());
-            getASCIICode(Plain.getText());
             for (int i = 0; i < Plain.getText().length(); i++) {
-                model.addRow(new Object[]{Plain.getText().charAt(i), asci.get(i), binary.get(i)});
+                asci.add((int) (Plain.getText().charAt(i)));
+                model.addRow(new Object[]{Plain.getText().charAt(i), asci.get(i), binary1.get(i)});
                 letters.add(Plain.getText().charAt(i));
             }
         }
@@ -376,10 +396,17 @@ public class Encryption extends javax.swing.JFrame {
             if (loadEmp.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 selectedFile = loadEmp.getSelectedFile();
                 if (selectedFile.canRead() && selectedFile.exists()) {
-                    byte[] bytes = readSmallBinaryFile(selectedFile.getAbsolutePath());
-                    for (byte b : bytes) {
-                        //asci.add((int) b);
-                        Plain.setText(Plain.getText() + (char) (b));
+                    File f = new File(selectedFile.getAbsolutePath());
+                    String s = "";
+                    Scanner in = new Scanner(f);
+                    while (in.hasNext()) {
+                        s += in.nextLine();
+                    }
+                    //byte[] bytes = readSmallBinaryFile(selectedFile.getAbsolutePath());
+                    for (char b:s.toCharArray()) {
+                        asci.add((int) b);
+                        //System.out.println(b);
+                        Plain.setText(Plain.getText() + (char) (asci.get(i).intValue()));
                         i++;
                     }
                 }
@@ -394,7 +421,15 @@ public class Encryption extends javax.swing.JFrame {
 
     byte[] readSmallBinaryFile(String aFileName) throws IOException {
         Path path = Paths.get(aFileName);
-        return Files.readAllBytes(path);
+        File f = new File(aFileName);
+        String s = "";
+        Scanner in = new Scanner(f);
+        while (in.hasNext()) {
+            s += in.nextLine();
+        }
+        //System.out.println((int) s.charAt(0));
+        return s.getBytes(StandardCharsets.UTF_8);
+
     }
 
     public void getASCIICode(String line) {
@@ -413,7 +448,16 @@ public class Encryption extends javax.swing.JFrame {
             ch = (line.charAt(i));
             c = (int) ch;
             a[i] = Integer.toBinaryString(c);//String
-            binary.add(a[i]);
+            if (a[i].length() < 12) {
+                for (int j = 0; j < 12 - a[i].length(); j++) {
+                    n += "0";
+                }
+                n += a[i];
+                //System.out.print(n+"\n");
+            }
+            binary1.add(n);
+            n = "";
+            binary.add(Long.valueOf(a[i]));
         }
     }
 

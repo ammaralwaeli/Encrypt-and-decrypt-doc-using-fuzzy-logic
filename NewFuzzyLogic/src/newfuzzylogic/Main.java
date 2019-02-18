@@ -72,7 +72,7 @@ public class Main extends javax.swing.JFrame {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/mainBG.jpg"))); // NOI18N
         getContentPane().add(jLabel1);
-        jLabel1.setBounds(-6, -6, 840, 660);
+        jLabel1.setBounds(-6, -6, 820, 590);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

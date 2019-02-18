@@ -23,9 +23,7 @@ public class Number {
     public Number(String line) {
         int array[] = new int[line.length()];
         for (int i = 0; i < line.length(); i++) {
-            ch = (line.charAt(i));
-            c = (int) ch;
-            array[i] = c;
+            array[i] = (int)(line.charAt(i));
         }
         for (int i = 0; i < line.length(); i++) {
             sum = sum + array[i];

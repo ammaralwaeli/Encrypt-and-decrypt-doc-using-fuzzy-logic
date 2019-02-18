@@ -5,8 +5,12 @@
  */
 package newfuzzylogic;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -348,6 +352,42 @@ public class Decryption extends javax.swing.JFrame {
             if (loadEmp.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 selectedFile = loadEmp.getSelectedFile();
                 if (selectedFile.canRead() && selectedFile.exists()) {
+                    File f = new File(selectedFile.getAbsolutePath());
+                    String s = "";
+                    Scanner in = new Scanner(f);
+                    while (in.hasNext()) {
+                        s += in.nextLine();
+                    }
+                    //byte[] bytes = readSmallBinaryFile(selectedFile.getAbsolutePath());
+                    
+                    for (char b : s.toCharArray()) {
+                        asci.add((int) b);
+                        Plain.setText(Plain.getText() + (char) (asci.get(i).intValue()));
+                        i++;
+                    }
+                }
+                Plain.setEditable(false);
+            } else {
+                Plain.setEditable(true);
+            }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public void loadFileUTF() throws IOException {
+        flag2 = true;
+        flag3 = true;
+        String line;
+        int i = 0;
+        try {
+            JFileChooser loadEmp = new JFileChooser();
+            File selectedFile;
+            BufferedReader in;
+            if (loadEmp.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                selectedFile = loadEmp.getSelectedFile();
+                if (selectedFile.canRead() && selectedFile.exists()) {
+                    in = new BufferedReader(new InputStreamReader(new FileInputStream(selectedFile.getAbsolutePath()), "utf-8"));
                     byte[] bytes = readSmallBinaryFile(selectedFile.getAbsolutePath());
                     for (byte b : bytes) {
                         asci.add((int) b);
@@ -385,8 +425,8 @@ public class Decryption extends javax.swing.JFrame {
             ch = (line.charAt(i));
             c = (int) ch;
             a[i] = Integer.toBinaryString(c);//String
-            if (a[i].length() < 8) {
-                for (int j = 0; j < 8 - a[i].length(); j++) {
+            if (a[i].length() < 12) {
+                for (int j = 0; j < 12 - a[i].length(); j++) {
                     n += "0";
                 }
                 n += a[i];
